@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>افتحي الصندوق | مراجعة صيغ الأملاح المائية</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1221;--card:#14233d;--line:#314666;--gold:#ffce69;--white:#f6f8fd;--sub:#b8c9df;--green:#9be5bc}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#1c3458 0%,var(--bg) 70%);font-family:Tahoma,Arial,sans-serif;color:var(--white);display:flex;justify-content:center;align-items:center;padding:24px}
+main{width:min(850px,100%);background:#101d33e8;border:1px solid #334766;border-radius:26px;padding:clamp(20px,4vw,38px);box-shadow:0 22px 70px #0007}
+header{text-align:center} .mark{font-size:44px}h1{font-size:clamp(27px,5vw,43px);margin:6px 0;color:var(--gold)}.subtitle{font-size:clamp(14px,2.7vw,19px);color:var(--sub);margin:10px 0 6px}.hint{font-size:14px;color:#a6b9d2;margin:0 0 25px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.tile{min-height:158px;border:2px solid #435e81;border-radius:18px;background:linear-gradient(145deg,#253e62,#172945);color:white;cursor:pointer;transition:transform .18s,border-color .18s,background .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font:700 19px Tahoma,Arial,sans-serif}.tile:hover,.tile:focus-visible{transform:translateY(-5px);border-color:var(--gold);outline:none}.tile.selected{border-color:var(--gold);background:#2c4c77}.tile.visited:not(.selected){background:#1b3944;border-color:#4d8b86}.emoji{font-size:49px;line-height:1}
+.panel{margin-top:22px;border:1px solid #3d5576;border-radius:17px;background:#1d304d;padding:22px;text-align:center;min-height:155px}.panel.empty{display:flex;align-items:center;justify-content:center;color:var(--sub)}.tag{color:var(--gold);font-size:14px;font-weight:700}.question{font-size:clamp(19px,3.4vw,25px);line-height:1.8;margin:12px 0 18px}.answer{border-top:1px solid #4d6686;margin-top:20px;padding-top:17px;font-size:clamp(17px,3vw,21px);color:var(--green);line-height:1.8}.btn{background:var(--gold);border:0;color:#12213b;border-radius:13px;padding:12px 25px;font:700 16px Tahoma,Arial,sans-serif;cursor:pointer}.btn:hover{filter:brightness(1.08)}.btn.secondary{background:transparent;color:var(--white);border:1px solid #667e9d;padding:9px 17px;font-size:14px}.actions{margin:20px 0 8px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.count{font-size:14px;color:var(--sub)}footer{border-top:1px solid #334766;padding-top:20px;margin-top:18px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:#d4e0f1;font-size:14px}footer strong{color:var(--gold)}
+@media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}.tile{min-height:120px}.emoji{font-size:37px}footer{flex-direction:column;text-align:center;gap:8px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="mark">🎁</div><h1>افتحي الصندوق</h1><p class="subtitle">مراجعة المكتسبات السابقة | صيغ الأملاح المائية</p><p class="hint">اختاري صندوقًا، وأجيبي عن السؤال قبل كشف الإجابة</p></header>
+<section class="grid" id="boxes" aria-label="صناديق الأسئلة"></section>
+<section class="panel empty" id="panel" aria-live="polite">اختاري أحد الصناديق الأربعة لبدء المراجعة</section>
+<div class="actions"><span class="count" id="count">الصناديق المفتوحة: 0 من 4</span><button class="btn secondary" id="reset">↻ إعادة اللعب</button></div>
+<footer><span>معلمة المقرر: <strong>أ. مشاعل القحطاني</strong></span><span>مديرة المدرسة: <strong>أ. منيرة العصيمي</strong></span></footer>
+</main>
+<script>
+const questions=[
+ {q:'ما المقصود بالملح المائي؟',a:'مركب أيوني صلب يحتوي على جزيئات ماء ضمن تركيبه البلوري.'},
+ {q:'ماذا ينتج عند تسخين الملح المائي وفقد ماء التبلور؟',a:'ملح لامائي.'},
+ {q:'ما الاسم العلمي للملح CaSO₄·2H₂O؟',a:'كبريتات الكالسيوم ثنائية الماء.'},
+ {q:'ما استخدام كلوريد الكالسيوم اللامائي؟',a:'يُستخدم مادةً مجففة لامتصاص الرطوبة.'}
+];
+const boxes=document.getElementById('boxes'),panel=document.getElementById('panel'),count=document.getElementById('count');
+const visited=new Set();let selected=null,revealed=false;
+function render(){boxes.innerHTML='';questions.forEach((item,i)=>{const button=document.createElement('button');button.type='button';button.className='tile'+(visited.has(i)?' visited':'')+(selected===i?' selected':'');button.setAttribute('aria-label','افتحي الصندوق '+(i+1));button.setAttribute('aria-pressed',String(selected===i));button.innerHTML=`<span class="emoji" aria-hidden="true">${visited.has(i)?'✅':'🎁'}</span><span>الصندوق ${i+1}</span>`;button.addEventListener('click',()=>{selected=i;revealed=false;visited.add(i);render()});boxes.appendChild(button)});count.textContent=`الصناديق المفتوحة: ${visited.size} من ${questions.length}`;
+if(selected===null){panel.className='panel empty';panel.textContent='اختاري أحد الصناديق الأربعة لبدء المراجعة';return}
+panel.className='panel';panel.innerHTML='';const tag=document.createElement('div');tag.className='tag';tag.textContent='سؤال الصندوق '+(selected+1);const question=document.createElement('div');question.className='question';question.textContent=questions[selected].q;const answerButton=document.createElement('button');answerButton.className='btn';answerButton.type='button';answerButton.textContent=revealed?'إخفاء الإجابة':'اكشفي الإجابة';answerButton.addEventListener('click',()=>{revealed=!revealed;render()});panel.append(tag,question,answerButton);if(revealed){const answer=document.createElement('div');answer.className='answer';answer.textContent=questions[selected].a;panel.appendChild(answer)}}
+document.getElementById('reset').addEventListener('click',()=>{visited.clear();selected=null;revealed=false;render()});render();
+</script>
+</body>
+</html>
